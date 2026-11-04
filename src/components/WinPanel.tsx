@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Share2, Check } from 'lucide-react';
 import type { Puzzle } from '../puzzles/puzzle';
 import type { GameRecord } from '../game/game';
@@ -6,20 +6,21 @@ import { buildShareText, shareResult } from '../game/share';
 import { formatFactorization } from '../engine/math';
 import { msUntilNextDay } from '../engine/dates';
 
-function useCountdown(): string {
+function useCountdown(enabled: boolean): string {
   const [ms, setMs] = useState(() => msUntilNextDay());
   useEffect(() => {
+    if (!enabled) return;
     const id = window.setInterval(() => setMs(msUntilNextDay()), 1000);
     return () => window.clearInterval(id);
-  }, []);
+  }, [enabled]);
   const s = Math.floor(ms / 1000);
   const p = (n: number) => String(n).padStart(2, '0');
   return `${p(Math.floor(s / 3600))}:${p(Math.floor((s % 3600) / 60))}:${p(s % 60)}`;
 }
 
-export function WinPanel({ puzzle, record, fresh }: { puzzle: Puzzle; record: GameRecord; fresh: boolean }) {
+export function WinPanel({ puzzle, record, fresh, footer }: { puzzle: Puzzle; record: GameRecord; fresh: boolean; footer?: ReactNode }) {
   const [status, setStatus] = useState<string | null>(null);
-  const countdown = useCountdown();
+  const countdown = useCountdown(!footer);
   const digits = String(puzzle.answer).split('');
   const n = record.guesses.length;
 
@@ -68,6 +69,9 @@ export function WinPanel({ puzzle, record, fresh }: { puzzle: Puzzle; record: Ga
         </ul>
       </div>
 
+      {footer ? (
+        <div className="border-t border-line pt-4">{footer}</div>
+      ) : (
       <div className="flex flex-col items-center gap-3 border-t border-line pt-4 sm:flex-row sm:justify-between">
         <div className="text-center sm:text-left">
           <p className="text-xs uppercase tracking-widest text-muted">Next INTEGER in</p>
@@ -77,6 +81,7 @@ export function WinPanel({ puzzle, record, fresh }: { puzzle: Puzzle; record: Ga
           <Share2 size={18} /> {status ?? 'Share'}
         </button>
       </div>
+      )}
     </section>
   );
 }

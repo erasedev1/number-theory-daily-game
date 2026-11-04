@@ -2,6 +2,9 @@
 
 Find the hidden positive integer from number-theory clues. Every guess lights up the clues *that guess* satisfies — nothing stays lit from earlier guesses. One shared puzzle per day, changing at midnight America/New_York.
 
+## Unlimited mode
+The **Unlimited** tab generates a fresh, exhaustively validated puzzle on demand (Easy / Medium / Hard) in a Web Worker. A puzzle is fully determined by `(difficulty, seed)`, so a refresh resumes the same game. It is stored separately and never touches daily records or statistics. Generation lives in `src/engine/generator.ts` (shared with the curated-pool script). Hard puzzles take ~1–2 s to generate.
+
 ## Run locally
 ```bash
 npm install

@@ -13,14 +13,32 @@ import { selectPuzzle, puzzleNumber } from './puzzles/daily';
 import { buildPuzzle } from './puzzles/puzzle';
 import { evaluateGuess, newRecord, submitGuess } from './game/game';
 import { computeStats } from './game/stats';
+import { UnlimitedGame } from './components/UnlimitedGame';
 
 type ModalName = 'stats' | 'help' | 'settings' | null;
+type Mode = 'daily' | 'unlimited';
+const MODE_KEY = 'integer:v1:mode';
 
 export default function App() {
   const today = useToday();
   const { records, settings, commit, fresh, updateSettings } = useGameStore();
   const [modal, setModal] = useState<ModalName>(null);
   const [justWon, setJustWon] = useState(false);
+  const [mode, setModeState] = useState<Mode>(() => {
+    try {
+      return localStorage.getItem(MODE_KEY) === 'unlimited' ? 'unlimited' : 'daily';
+    } catch {
+      return 'daily';
+    }
+  });
+  const setMode = (m: Mode) => {
+    setModeState(m);
+    try {
+      localStorage.setItem(MODE_KEY, m);
+    } catch {
+      /* ignore */
+    }
+  };
 
   const puzzleNo = puzzleNumber(today);
   const puzzle = useMemo(() => buildPuzzle(selectPuzzle(today)), [today]);
@@ -81,18 +99,35 @@ export default function App() {
         <div className="text-center">
           <h1 className="sr-only">INTEGER</h1>
           <Wordmark className="block text-5xl sm:text-6xl" />
-          <p className="mt-3 text-lg text-muted">Can you find today's number?</p>
+          <div className="mx-auto mt-4 grid max-w-xs grid-cols-2 gap-1 rounded-xl bg-surface p-1" role="tablist" aria-label="Game mode">
+            {(['daily', 'unlimited'] as const).map((m) => (
+              <button
+                key={m}
+                role="tab"
+                aria-selected={mode === m}
+                onClick={() => setMode(m)}
+                className={`rounded-lg py-1.5 text-sm font-semibold capitalize transition ${mode === m ? 'bg-bg shadow-sm' : 'text-muted hover:text-ink'}`}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <ClueList clues={puzzle.clues} states={states} />
-
-        {solved ? (
-          <WinPanel puzzle={puzzle} record={record} fresh={justWon} />
+        {mode === 'unlimited' ? (
+          <UnlimitedGame />
         ) : (
-          <GuessForm key={today} max={puzzle.max} onSubmit={onGuess} />
+          <>
+            <p className="-mt-2 text-center text-lg text-muted">Can you find today's number?</p>
+            <ClueList clues={puzzle.clues} states={states} />
+            {solved ? (
+              <WinPanel puzzle={puzzle} record={record} fresh={justWon} />
+            ) : (
+              <GuessForm key={today} max={puzzle.max} onSubmit={onGuess} />
+            )}
+            <GuessHistory puzzle={puzzle} guesses={record.guesses} />
+          </>
         )}
-
-        <GuessHistory puzzle={puzzle} guesses={record.guesses} />
       </main>
 
       {modal === 'stats' && <StatsModal stats={stats} highlight={solved ? record.guesses.length : null} onClose={close} />}
