@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="INTEGER — a daily mathematical deduction game. Find the hidden number from number-theory clues." />
+    <meta name="theme-color" content="#faf8f3" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>INTEGER — a daily number-theory puzzle</title>
+    <script>
+      // Apply the saved theme before first paint to avoid a flash.
+      try {
+        var s = JSON.parse(localStorage.getItem('integer:v1:settings') || '{}');
+        var dark = s.theme === 'dark' || (s.theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        if (s.colorblind) document.documentElement.dataset.cb = '1';
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

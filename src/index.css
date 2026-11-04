@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: 250 248 243;
+  --surface: 238 235 227;
+  --ink: 34 34 38;
+  --muted: 109 107 100;
+  --line: 223 220 210;
+  --good: 94 143 103;
+  --good-ink: 255 255 255;
+  --bad: 178 74 60;
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  --bg: 26 26 28;
+  --surface: 44 44 48;
+  --ink: 240 237 230;
+  --muted: 152 150 144;
+  --line: 62 62 66;
+  --good: 86 132 95;
+  --good-ink: 250 250 246;
+  --bad: 214 108 92;
+  color-scheme: dark;
+}
+:root[data-cb='1'] { --good: 58 108 178; }
+:root[data-theme='dark'][data-cb='1'] { --good: 70 118 190; }
+
+html, body, #root { min-height: 100%; }
+body {
+  @apply bg-bg text-ink font-sans antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.num { font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 2px solid rgb(var(--good)); outline-offset: 2px; }
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 font-semibold transition active:scale-[0.98] disabled:opacity-50;
+  }
+  .icon-btn {
+    @apply inline-flex h-10 w-10 items-center justify-center rounded-lg text-muted transition hover:bg-surface hover:text-ink;
+  }
+}
+
+@keyframes pop { 0% { transform: scale(0.96); } 50% { transform: scale(1.025); } 100% { transform: scale(1); } }
+@keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes flip { 0% { transform: rotateX(90deg); opacity: 0; } 100% { transform: rotateX(0); opacity: 1; } }
+@keyframes ring { 0% { transform: scale(0.6); opacity: 0.6; } 100% { transform: scale(2.2); opacity: 0; } }
+@keyframes checkin { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.anim-pop { animation: pop 0.35s ease; }
+.anim-shake { animation: shake 0.4s ease; }
+.anim-rise { animation: rise 0.35s ease both; }
+.anim-fade { animation: fade 0.2s ease both; }
+.anim-flip { animation: flip 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.anim-ring { animation: ring 1.1s ease-out both; }
+.anim-check { animation: checkin 0.3s cubic-bezier(0.3, 1.4, 0.5, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.01ms !important; }
+}
